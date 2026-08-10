@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The 3D Papier-Mâché Tarot Card Project</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600;9..144,700&family=Space+Mono:wght@400;700&family=Work+Sans:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600;9..144,700&family=Caveat:wght@500;600;700&family=Space+Mono:wght@400;700&family=Work+Sans:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#0a0908;
@@ -72,19 +72,39 @@
     margin:0 auto;
   }
 
-  h1{
-    font-family:'Fraunces', serif;
-    font-weight:600;
-    font-size:clamp(2.1rem, 4.4vw, 3.6rem);
+  /* ---------- cut-out letter headers ---------- */
+  .cutout-word{
+    display:inline-block;
+    white-space:nowrap;
+    margin:0 0.12em;
+  }
+  .cutout-letter{
+    display:inline-block;
+    font-family:'Caveat', cursive;
+    font-weight:700;
+    background:var(--frame);
+    color:#17130f;
+    padding:0.02em 0.16em 0.05em;
+    margin:0 0.02em;
+    border-radius:2px;
+    box-shadow:0 3px 5px rgba(0,0,0,0.4);
+    line-height:1.2;
+  }
+  .cutout-letter.accent{
+    background:var(--oxblood);
+    color:var(--cream);
+  }
+
+
+    font-family:'Caveat', cursive;
+    font-weight:700;
+    font-size:clamp(2.6rem, 5.6vw, 4.6rem);
     line-height:1.05;
-    letter-spacing:-0.01em;
-    text-transform:uppercase;
+    letter-spacing:0.005em;
   }
   h1 em{
-    font-style:italic;
-    font-weight:500;
+    font-style:normal;
     color:var(--gold);
-    text-transform:none;
   }
 
   .hero p.lede{
@@ -156,12 +176,11 @@
     position:absolute;
     left:11px; right:11px; bottom:11px;
     text-align:center;
-    font-family:'Fraunces', serif;
-    font-weight:500;
-    font-size:0.66rem;
-    letter-spacing:0.06em;
-    text-transform:uppercase;
-    color:rgba(237,228,209,0.8);
+    font-family:'Caveat', cursive;
+    font-weight:600;
+    font-size:1rem;
+    letter-spacing:0.02em;
+    color:rgba(237,228,209,0.85);
     padding:6px 4px 2px;
   }
 
@@ -178,9 +197,9 @@
     padding-top:1.6rem;
   }
   .section-head h2{
-    font-family:'Fraunces', serif;
-    font-weight:600;
-    font-size:clamp(1.5rem,2.8vw,2.1rem);
+    font-family:'Caveat', cursive;
+    font-weight:700;
+    font-size:clamp(2rem,3.6vw,2.8rem);
   }
   .section-head p{
     font-family:'Space Mono', monospace;
@@ -269,10 +288,9 @@
     box-shadow:0 30px 60px rgba(0,0,0,0.6);
   }
   .lightbox-caption{
-    font-family:'Fraunces', serif;
-    font-style:italic;
-    font-weight:500;
-    font-size:1rem;
+    font-family:'Caveat', cursive;
+    font-weight:600;
+    font-size:1.3rem;
     color:var(--cream);
   }
   .lightbox-close{
@@ -297,13 +315,13 @@
     margin:0 auto;
   }
   .about h2{
-    font-family:'Fraunces', serif;
-    font-weight:600;
-    font-size:clamp(1.6rem,3vw,2.2rem);
-    line-height:1.15;
+    font-family:'Caveat', cursive;
+    font-weight:700;
+    font-size:clamp(2rem,3.8vw,2.8rem);
+    line-height:1.1;
     margin-bottom:1.4rem;
   }
-  .about h2 em{ color:var(--gold); font-style:italic; font-weight:500; }
+  .about h2 em{ color:var(--gold); font-style:normal; }
   .about p{
     font-size:1rem;
     line-height:1.75;
@@ -398,7 +416,7 @@
     { num:"V",    name:"The Hierophant",     filmed:true,  video:"videos/05-the-hierophant.mp4",     poster:"videos/posters/05-the-hierophant.jpg" },
     { num:"VI",   name:"The Lovers",         filmed:true,  video:"videos/06-the-lovers.mp4",         poster:"videos/posters/06-the-lovers.jpg" },
     { num:"VII",  name:"The Chariot",        filmed:true,  video:"videos/07-the-chariot.mp4",        poster:"videos/posters/07-the-chariot.jpg" },
-    { num:"VIII", name:"Strength",           filmed:false },
+    { num:"VIII", name:"Strength",           filmed:true,  video:"videos/08-strength.mp4",           poster:"videos/posters/08-strength.jpg" },
     { num:"IX",   name:"The Hermit",         filmed:false },
     { num:"X",    name:"Wheel of Fortune",   filmed:false },
     { num:"XI",   name:"Justice",            filmed:false },
@@ -413,6 +431,45 @@
     { num:"XX",   name:"Judgement",          filmed:false },
     { num:"XXI",  name:"The World",          filmed:false }
   ];
+
+  // ---------- cut-out letter headers ----------
+  function hashCode(s){
+    let h = 0;
+    for(let i=0;i<s.length;i++){ h = (h*31 + s.charCodeAt(i)) >>> 0; }
+    return h;
+  }
+
+  function cutoutify(node, accent=false){
+    Array.from(node.childNodes).forEach(child => {
+      if(child.nodeType === Node.TEXT_NODE){
+        const frag = document.createDocumentFragment();
+        const tokens = child.textContent.split(/(\s+)/);
+        tokens.forEach(tok => {
+          if(tok.trim() === ""){ frag.appendChild(document.createTextNode(tok)); return; }
+          const wordSpan = document.createElement("span");
+          wordSpan.className = "cutout-word";
+          [...tok].forEach((ch, i) => {
+            const letterSpan = document.createElement("span");
+            letterSpan.className = "cutout-letter" + (accent ? " accent" : "");
+            letterSpan.textContent = ch;
+            const seed = hashCode(ch + i + tok);
+            const rot = (seed % 15) - 7;
+            const ty = (seed % 8) - 4;
+            letterSpan.style.transform = `rotate(${rot}deg) translateY(${ty}px)`;
+            wordSpan.appendChild(letterSpan);
+          });
+          frag.appendChild(wordSpan);
+        });
+        child.replaceWith(frag);
+      } else if(child.nodeType === Node.ELEMENT_NODE && child.tagName === "EM"){
+        cutoutify(child, true);
+        while(child.firstChild) child.parentNode.insertBefore(child.firstChild, child);
+        child.remove();
+      }
+    });
+  }
+
+  document.querySelectorAll("h1, .section-head h2, .about h2").forEach(el => cutoutify(el));
 
   const grid = document.getElementById("deck-grid");
 
